@@ -20,7 +20,7 @@ export type ContractFieldCondition = {
     value: BytesLike
 }
 
-export type Operator = "eq" | "gt" | "gte" | "lt" | "lte"
+export type Operator = "eq" | "neq" | "gt" | "gte" | "lt" | "lte"
 
 export function encodeConditions(conditions: ConditionExpression): string {
     return JSON.stringify(conditions, (key, value) => {
