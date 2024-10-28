@@ -1,6 +1,6 @@
 import {describe, expect, it} from "@jest/globals"
 import {AbiCoder} from "ethers"
-import {ConditionExpression, encodeConditions} from "../src/conditions"
+import {ConditionExpression, encodeConditions} from "../src"
 
 describe("conditions", () => {
     it("should serialise to JSON as strings", () => {

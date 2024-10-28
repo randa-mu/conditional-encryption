@@ -23,7 +23,8 @@ export class ConditionalEncryption {
         return tx.wait(1)
     }
 
-    async decrypt(ciphertext: BytesLike): Promise<Buffer> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async decrypt(ciphertext: BytesLike, _signature: BytesLike): Promise<Buffer> {
         return Promise.resolve(Buffer.from(getBytes(ciphertext)))
     }
 }
