@@ -1,6 +1,6 @@
 import {describe, it, expect} from "@jest/globals"
 import {Wallet} from "ethers"
-import {ConditionalEncryption} from "../src/index"
+import {ConditionalEncryption} from "../src"
 
 describe("encryption", () => {
   it("class can be constructed", () => {
