@@ -1,5 +1,4 @@
-import {AbiCoder, AddressLike, BytesLike, isHexString, ParamType} from "ethers"
-import {HexString} from "ethers/lib.esm/utils/data"
+import {BytesLike, isHexString, ParamType} from "ethers"
 
 export type ConditionExpression = Condition | CompoundCondition
 export type CompoundCondition = And | Or
@@ -15,7 +14,7 @@ export type TimeCondition = {
 
 export type ContractFieldCondition = {
     type: "contract_param",
-    address: HexString,
+    address: string,
     field: string | ParamType
     operator: Operator
     value: BytesLike
