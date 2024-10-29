@@ -4,7 +4,7 @@ export type ConditionExpression = Condition | CompoundCondition
 export type CompoundCondition = And | Or
 export type And = { type: "and", left: ConditionExpression, right: ConditionExpression }
 export type Or = { type: "or", left: ConditionExpression, right: ConditionExpression }
-export type Condition = TimeCondition | ContractFieldCondition
+export type Condition = TimeCondition | ContractFieldCondition | typeof EmptyCondition
 
 export type TimeCondition = {
     type: "time",
@@ -20,10 +20,14 @@ export type ContractFieldCondition = {
     value: BytesLike
 }
 
+export const EmptyCondition = {
+    type: "empty"
+}
+
 export type Operator = "eq" | "neq" | "gt" | "gte" | "lt" | "lte"
 
-export function encodeConditions(conditions: ConditionExpression): string {
-    return JSON.stringify(conditions, (key, value) => {
+export function encodeConditions(conditions: ConditionExpression): Uint8Array {
+    const json = JSON.stringify(conditions, (key, value) => {
             if (key === "address" && !isHexString(value)) {
                 throw Error("you must pass addresses as hex values")
             }
@@ -35,4 +39,5 @@ export function encodeConditions(conditions: ConditionExpression): string {
             return typeof value === "bigint" ? value.toString() : value
         }
     )
+    return Buffer.from(json, "utf8")
 }
