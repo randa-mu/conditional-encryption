@@ -7,7 +7,6 @@ import {DecryptionSender, DecryptionSender__factory} from "./generated"
  * If you call encrypt and upload private data to a public network somewhere...
  * then you're a silly sausage 🌭
  */
-export const CONDITIONAL_ENCRYPTION_ADDRESS_TESTNET = "0x901C774780722bfd89805b1f6cD700CE49920A4d"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function encrypt(plaintext: Uint8Array, _conditions: Uint8Array): Uint8Array {
@@ -25,11 +24,12 @@ type DecryptionResponse = {
     signature: BytesLike,
 }
 
+export const CONDITIONAL_ENCRYPTION_ADDRESS_TESTNET = "0x901C774780722bfd89805b1f6cD700CE49920A4d"
 export class ConditionalEncryption {
     private readonly contract: DecryptionSender
 
-    constructor(rpc: Signer | Provider) {
-        this.contract = DecryptionSender__factory.connect(CONDITIONAL_ENCRYPTION_ADDRESS_TESTNET, rpc)
+    constructor(rpc: Signer | Provider, contractAddress: string = CONDITIONAL_ENCRYPTION_ADDRESS_TESTNET) {
+        this.contract = DecryptionSender__factory.connect(contractAddress, rpc)
     }
 
     /**
