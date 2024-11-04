@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import "../lib/TypesLib.sol";
+import "./TypesLib.sol";
 
 // todo subscription and payments
 // todo we could embed the following for subscription and payments - subscriptionID, numberOfRequestTxConfirmations, callbackGasLimit, numRandomValues
