@@ -406,6 +406,15 @@ export function kyberMarshalG2(p: G2) {
     ].join("")
 }
 
+export function mclMarshalG2(p: G2) {
+    return [
+        byteSwap(p.getX().get_a().serializeToHexStr(), 32),
+        byteSwap(p.getX().get_b().serializeToHexStr(), 32),
+        byteSwap(p.getY().get_a().serializeToHexStr(), 32),
+        byteSwap(p.getY().get_b().serializeToHexStr(), 32),
+    ].join("")
+}
+
 export function kyberMarshalG1(p: G1) {
     return [
         byteSwap(p.getX().serializeToHexStr(), 32),
