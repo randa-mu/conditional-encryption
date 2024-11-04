@@ -11,4 +11,13 @@ library TypesLib {
         bytes signature;
         address callback;
     }
+
+    // Blocklock request stores details needed to generate blocklock decryption keys
+    struct BlocklockRequest {
+        uint256 signatureRequestID;
+        uint256 blockHeight;
+        bytes ciphertext;
+        bytes signature;
+        address callback;
+    }
 }
