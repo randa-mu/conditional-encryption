@@ -25,11 +25,12 @@ export const BLOCKLOCK_IBE_OPTS: IbeOpts = {
     }
 }
 
+const BLOCKLOCK_TESTNET_ADDR = "0x588ac0c6fb691e6bf3817f46eb0c834d967156af"
 export class Blocklock {
     private blocklockSender: BlocklockSender
 
-    constructor(blocklockSenderContractAddr: string, provider: Signer | Provider) {
-        this.blocklockSender = BlocklockSender__factory.connect(blocklockSenderContractAddr, provider)
+    constructor(provider: Signer | Provider, contractAddr: string = BLOCKLOCK_TESTNET_ADDR) {
+        this.blocklockSender = BlocklockSender__factory.connect(contractAddr, provider)
     }
 
     /**
