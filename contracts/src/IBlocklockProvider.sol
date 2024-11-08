@@ -3,7 +3,7 @@ pragma solidity 0.8.24;
 
 import "./TypesLib.sol";
 
-interface IBlocklockSender {
+interface IBlocklockProvider {
     /**
      * @notice Requests the generation of a blocklock decryption key at a specific blockHeight.
      * @dev Initiates a blocklock decryption key request.
