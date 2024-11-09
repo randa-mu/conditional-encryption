@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import {ModexpInverse, ModexpSqrt, ModUtils} from "../lib/ModExp.sol";
+import {ModexpInverse, ModexpSqrt, ModUtils} from "./ModExp.sol";
 
 /// @title  Boneh–Lynn–Shacham (BLS) signature scheme on Barreto-Naehrig 254 bit curve (BN-254) used to verify BLS signaturess on the BN254 curve in Solidity
 /// @notice We use BLS signature aggregation to reduce the size of signature data to store on chain.
