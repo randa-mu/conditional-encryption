@@ -1,36 +1,31 @@
-import { BaseContract, getBytes, LogDescription, Provider, Signer, TransactionReceipt } from "ethers"
-import {
-    type BlocklockSender,
-    BlocklockSender__factory
-} from "./generated"
-import { keccak_256 } from '@noble/hashes/sha3';
-import {
-    Ciphertext,
-    decrypt_towards_identity_g1, deserializeCiphertext,
-    encrypt_towards_identity_g1, G1,
-    G2,
-    IbeOpts,
-    serializeCiphertext
-} from "./crypto/ibe_bn254"
+import {getBytes, Provider, Signer} from "ethers"
+import {keccak_256} from "@noble/hashes/sha3"
+import {BlocklockSender, BlocklockSender__factory} from "./generated"
+import {TypesLib as BlocklockTypes} from "./generated/BlocklockSender"
+import {extractSingleLog} from "./ethers_utils"
+import {Ciphertext, decrypt_g1_with_preprocess, encrypt_towards_identity_g1, G2, IbeOpts} from "./crypto/ibe-bn254"
+
 
 export const BLOCKLOCK_IBE_OPTS: IbeOpts = {
     hash: keccak_256,
     k: 128,
     expand_fn: "xmd",
     dsts: {
-        H1_G1: Buffer.from('BLOCKLOCK_BN254G1_XMD:KECCAK-256_SVDW_RO_H1_'),
-        H2: Buffer.from('BLOCKLOCK_BN254_XMD:KECCAK-256_H2_'),
-        H3: Buffer.from('BLOCKLOCK_BN254_XMD:KECCAK-256_H3_'),
-        H4: Buffer.from('BLOCKLOCK_BN254_XMD:KECCAK-256_H4_'),
+        H1_G1: Buffer.from("BLOCKLOCK_BN254G1_XMD:KECCAK-256_SVDW_RO_H1_"),
+        H2: Buffer.from("BLOCKLOCK_BN254_XMD:KECCAK-256_H2_"),
+        H3: Buffer.from("BLOCKLOCK_BN254_XMD:KECCAK-256_H3_"),
+        H4: Buffer.from("BLOCKLOCK_BN254_XMD:KECCAK-256_H4_"),
     }
 }
 
-const BLOCKLOCK_TESTNET_ADDR = "0x588ac0c6fb691e6bf3817f46eb0c834d967156af"
+const defaultContractAddress = "0x11045878ed62ec3acc91ce36a46f4ef61d4616e1"
+const iface = BlocklockSender__factory.createInterface()
+
 export class Blocklock {
     private blocklockSender: BlocklockSender
 
-    constructor(provider: Signer | Provider, contractAddr: string = BLOCKLOCK_TESTNET_ADDR) {
-        this.blocklockSender = BlocklockSender__factory.connect(contractAddr, provider)
+    constructor(provider: Signer | Provider, private readonly contractAddress: string = defaultContractAddress) {
+        this.blocklockSender = BlocklockSender__factory.connect(contractAddress, provider)
     }
 
     /**
@@ -39,7 +34,7 @@ export class Blocklock {
      * @param ciphertext encrypted message to store on chain
      * @returns blocklock request id as a string
      */
-    async requestBlocklock(blockHeight: bigint, ciphertext: Uint8Array): Promise<string> {
+    async requestBlocklock(blockHeight: bigint, ciphertext: BlocklockTypes.CiphertextStruct): Promise<string> {
         // Request a blocklock at blockHeight
         const tx = await this.blocklockSender.requestBlocklock(blockHeight, ciphertext)
         const receipt = await tx.wait(1)
@@ -47,12 +42,7 @@ export class Blocklock {
             throw new Error("transaction has not been mined")
         }
 
-        const logs = parseLogs(receipt, this.blocklockSender, "BlocklockRequested")
-        if (logs.length === 0) {
-            throw Error("`requestBlocklock` didn't emit the expected log")
-        }
-
-        const [requestID,] = logs[0].args
+        const [requestID] = extractSingleLog(iface, receipt, this.contractAddress, iface.getEvent("BlocklockRequested"))
         return requestID
     }
 
@@ -78,7 +68,7 @@ export class Blocklock {
         return {
             id: events[0].args.requestID.toString(),
             blockHeight: events[0].args.blockHeight,
-            ciphertext: getBytes(events[0].args.ciphertext)
+            ciphertext: parseSolidityCiphertext(events[0].args.ciphertext)
         }
     }
 
@@ -97,7 +87,7 @@ export class Blocklock {
                 return [requestID, {
                     id: requestID,
                     blockHeight: event.args.blockHeight,
-                    ciphertext: getBytes(event.args.ciphertext),
+                    ciphertext: parseSolidityCiphertext(event.args.ciphertext),
                 }]
             })
         ))
@@ -126,8 +116,8 @@ export class Blocklock {
         return {
             id: events[0].args.requestID.toString(),
             blockHeight: events[0].args.blockHeight,
-            signature: events[0].args.signature,
-            ciphertext: getBytes(events[0].args.ciphertext),
+            decryptionKey: events[0].args.decryptionKey,
+            ciphertext: parseSolidityCiphertext(events[0].args.ciphertext),
         }
     }
 
@@ -149,8 +139,8 @@ export class Blocklock {
      * @param key decryption key
      * @returns plaintext
      */
-    decrypt(ciphertext: Ciphertext, key: G1): Uint8Array {
-        return decrypt_towards_identity_g1(ciphertext, key, BLOCKLOCK_IBE_OPTS)
+    decrypt(ciphertext: Ciphertext, key: Uint8Array): Uint8Array {
+        return decrypt_g1_with_preprocess(ciphertext, key, BLOCKLOCK_IBE_OPTS)
     }
 
     /**
@@ -160,9 +150,12 @@ export class Blocklock {
      * @param pk public key of the scheme
      * @returns the identifier of the blocklock request, and the ciphertext
      */
-    async encryptAndRegister(message: Uint8Array, blockHeight: bigint, pk: G2): Promise<{ id: string, ct: Ciphertext }> {
+    async encryptAndRegister(message: Uint8Array, blockHeight: bigint, pk: G2): Promise<{
+        id: string,
+        ct: Ciphertext
+    }> {
         const ct = this.encrypt(message, blockHeight, pk)
-        const id = await this.requestBlocklock(blockHeight, serializeCiphertext(ct))
+        const id = await this.requestBlocklock(blockHeight, encodeCiphertextToSolidity(ct))
         return {
             id: id.toString(),
             ct,
@@ -180,29 +173,53 @@ export class Blocklock {
             throw new Error("cannot find a request with this identifier")
         }
 
-        // Signature has not been delivered yet, return
-        if (!status.signature) {
+        // Decryption key has not been delivered yet, return
+        if (!status.decryptionKey) {
             return
         }
 
         // Deserialize ciphertext
-        const ct = deserializeCiphertext(status.ciphertext)
+        const ct = status.ciphertext
 
-        // Decrypt the ciphertext with the provided signature
-        const x = BigInt('0x' + status.signature.slice(2, 66))
-        const y = BigInt('0x' + status.signature.slice(66, 130))
-        return this.decrypt(ct, { x, y })
+        // Get decryption key
+        const decryptionKey = getBytes(status.decryptionKey)
+        return this.decrypt(ct, decryptionKey)
     }
 }
 
 export type BlocklockRequest = {
     id: string,
     blockHeight: bigint,
-    ciphertext: Uint8Array,
+    ciphertext: Ciphertext,
 }
 
 export type BlocklockStatus = BlocklockRequest & {
-    signature?: string,
+    decryptionKey?: string,
+}
+
+function parseSolidityCiphertext(ciphertext: BlocklockTypes.CiphertextStructOutput): Ciphertext {
+    const uX0 = ciphertext.u.x[0]
+    const uX1 = ciphertext.u.x[1]
+    const uY0 = ciphertext.u.y[0]
+    const uY1 = ciphertext.u.y[1]
+    return {
+        U: {x: {c0: uX0, c1: uX1}, y: {c0: uY0, c1: uY1}},
+        V: getBytes(ciphertext.v),
+        W: getBytes(ciphertext.w),
+    }
+}
+
+function encodeCiphertextToSolidity(ciphertext: Ciphertext): BlocklockTypes.CiphertextStruct {
+    const u: {x: [bigint, bigint], y: [bigint, bigint]} = {
+        x: [ciphertext.U.x.c0, ciphertext.U.x.c1],
+        y: [ciphertext.U.y.c0, ciphertext.U.y.c1]
+    }
+
+    return {
+        u,
+        v: ciphertext.V,
+        w: ciphertext.W,
+    }
 }
 
 function blockHeightToBEBytes(blockHeight: bigint) {
@@ -214,17 +231,4 @@ function blockHeightToBEBytes(blockHeight: bigint) {
     dataView.setBigUint64(24, blockHeight & 0xffff_ffff_ffff_ffffn)
 
     return new Uint8Array(buffer)
-}
-
-function parseLogs(receipt: TransactionReceipt, contract: BaseContract, eventName: string): Array<LogDescription> {
-    return receipt.logs
-        .map(log => {
-            try {
-                return contract.interface.parseLog(log)
-            } catch {
-                return null
-            }
-        })
-        .filter(log => log !== null)
-        .filter(log => log?.name === eventName)
 }

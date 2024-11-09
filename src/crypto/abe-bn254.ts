@@ -2,7 +2,7 @@
  * Conditional Encryption / Attribute-Based Encryption for marshmallow
  */
 
-import { encrypt_towards_identity_g1, G1, G2, get_identity_g1, serializeCiphertext } from "./ibe_bn254"
+import { encrypt_towards_identity_g1, G1, G2, get_identity_g1, serializeCiphertext } from "./ibe-bn254"
 
 export type Conditions = {
     blockHeight: bigint

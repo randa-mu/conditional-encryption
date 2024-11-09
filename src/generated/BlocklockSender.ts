@@ -23,25 +23,49 @@ import type {
   TypedContractMethod,
 } from "./common";
 
+export declare namespace BLS {
+  export type PointG2Struct = {
+    x: [BigNumberish, BigNumberish];
+    y: [BigNumberish, BigNumberish];
+  };
+
+  export type PointG2StructOutput = [
+    x: [bigint, bigint],
+    y: [bigint, bigint]
+  ] & { x: [bigint, bigint]; y: [bigint, bigint] };
+}
+
 export declare namespace TypesLib {
+  export type CiphertextStruct = {
+    u: BLS.PointG2Struct;
+    v: BytesLike;
+    w: BytesLike;
+  };
+
+  export type CiphertextStructOutput = [
+    u: BLS.PointG2StructOutput,
+    v: string,
+    w: string
+  ] & { u: BLS.PointG2StructOutput; v: string; w: string };
+
   export type BlocklockRequestStruct = {
-    signatureRequestID: BigNumberish;
+    decryptionRequestID: BigNumberish;
     blockHeight: BigNumberish;
-    ciphertext: BytesLike;
+    ciphertext: TypesLib.CiphertextStruct;
     signature: BytesLike;
     callback: AddressLike;
   };
 
   export type BlocklockRequestStructOutput = [
-    signatureRequestID: bigint,
+    decryptionRequestID: bigint,
     blockHeight: bigint,
-    ciphertext: string,
+    ciphertext: TypesLib.CiphertextStructOutput,
     signature: string,
     callback: string
   ] & {
-    signatureRequestID: bigint;
+    decryptionRequestID: bigint;
     blockHeight: bigint;
-    ciphertext: string;
+    ciphertext: TypesLib.CiphertextStructOutput;
     signature: string;
     callback: string;
   };
@@ -49,166 +73,163 @@ export declare namespace TypesLib {
 
 export interface BlocklockSenderInterface extends Interface {
   getFunction(
-    nameOrSignature:
-      | "DEFAULT_ADMIN_ROLE"
-      | "SCHEME_ID"
-      | "blocklockRequests"
-      | "getRequest"
-      | "getRoleAdmin"
-      | "grantRole"
-      | "hasRole"
-      | "isInFlight"
-      | "lastRequestID"
-      | "receiveSignature"
-      | "renounceRole"
-      | "requestBlocklock"
-      | "revokeRole"
-      | "signatureRequests"
-      | "signaturesToBlocklock"
-      | "supportsInterface"
+      nameOrSignature:
+          | "DEFAULT_ADMIN_ROLE"
+          | "DST_H1_G1"
+          | "DST_H2"
+          | "DST_H3"
+          | "DST_H4"
+          | "SCHEME_ID"
+          | "blocklockRequests"
+          | "decrypt"
+          | "decryptionSender"
+          | "getRequest"
+          | "getRoleAdmin"
+          | "grantRole"
+          | "hasRole"
+          | "isInFlight"
+          | "receiveDecryptionData"
+          | "renounceRole"
+          | "requestBlocklock"
+          | "revokeRole"
+          | "supportsInterface"
   ): FunctionFragment;
 
   getEvent(
-    nameOrSignatureOrTopic:
-      | "BlocklockCallbackFailed"
-      | "BlocklockCallbackSuccess"
-      | "BlocklockRequested"
-      | "RoleAdminChanged"
-      | "RoleGranted"
-      | "RoleRevoked"
+      nameOrSignatureOrTopic:
+          | "BlocklockCallbackFailed"
+          | "BlocklockCallbackSuccess"
+          | "BlocklockRequested"
+          | "RoleAdminChanged"
+          | "RoleGranted"
+          | "RoleRevoked"
   ): EventFragment;
 
   encodeFunctionData(
-    functionFragment: "DEFAULT_ADMIN_ROLE",
-    values?: undefined
+      functionFragment: "DEFAULT_ADMIN_ROLE",
+      values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "DST_H1_G1", values?: undefined): string;
+  encodeFunctionData(functionFragment: "DST_H2", values?: undefined): string;
+  encodeFunctionData(functionFragment: "DST_H3", values?: undefined): string;
+  encodeFunctionData(functionFragment: "DST_H4", values?: undefined): string;
   encodeFunctionData(functionFragment: "SCHEME_ID", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "blocklockRequests",
-    values: [BigNumberish]
+      functionFragment: "blocklockRequests",
+      values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getRequest",
-    values: [BigNumberish]
+      functionFragment: "decrypt",
+      values: [TypesLib.CiphertextStruct, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "getRoleAdmin",
-    values: [BytesLike]
+      functionFragment: "decryptionSender",
+      values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "grantRole",
-    values: [BytesLike, AddressLike]
+      functionFragment: "getRequest",
+      values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "hasRole",
-    values: [BytesLike, AddressLike]
+      functionFragment: "getRoleAdmin",
+      values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "isInFlight",
-    values: [BigNumberish]
+      functionFragment: "grantRole",
+      values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "lastRequestID",
-    values?: undefined
+      functionFragment: "hasRole",
+      values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "receiveSignature",
-    values: [BigNumberish, BytesLike]
+      functionFragment: "isInFlight",
+      values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "renounceRole",
-    values: [BytesLike, AddressLike]
+      functionFragment: "receiveDecryptionData",
+      values: [BigNumberish, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "requestBlocklock",
-    values: [BigNumberish, BytesLike]
+      functionFragment: "renounceRole",
+      values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "revokeRole",
-    values: [BytesLike, AddressLike]
+      functionFragment: "requestBlocklock",
+      values: [BigNumberish, TypesLib.CiphertextStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "signatureRequests",
-    values: [BigNumberish]
+      functionFragment: "revokeRole",
+      values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "signaturesToBlocklock",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "supportsInterface",
-    values: [BytesLike]
+      functionFragment: "supportsInterface",
+      values: [BytesLike]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "DEFAULT_ADMIN_ROLE",
-    data: BytesLike
+      functionFragment: "DEFAULT_ADMIN_ROLE",
+      data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "DST_H1_G1", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "DST_H2", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "DST_H3", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "DST_H4", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "SCHEME_ID", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "blocklockRequests",
-    data: BytesLike
+      functionFragment: "blocklockRequests",
+      data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "decrypt", data: BytesLike): Result;
+  decodeFunctionResult(
+      functionFragment: "decryptionSender",
+      data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getRequest", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getRoleAdmin",
-    data: BytesLike
+      functionFragment: "getRoleAdmin",
+      data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isInFlight", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "lastRequestID",
-    data: BytesLike
+      functionFragment: "receiveDecryptionData",
+      data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "receiveSignature",
-    data: BytesLike
+      functionFragment: "renounceRole",
+      data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "renounceRole",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "requestBlocklock",
-    data: BytesLike
+      functionFragment: "requestBlocklock",
+      data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "signatureRequests",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "signaturesToBlocklock",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "supportsInterface",
-    data: BytesLike
+      functionFragment: "supportsInterface",
+      data: BytesLike
   ): Result;
 }
 
 export namespace BlocklockCallbackFailedEvent {
   export type InputTuple = [
     requestID: BigNumberish,
-    signatureRequestID: BigNumberish,
     blockHeight: BigNumberish,
-    ciphertext: BytesLike,
-    signature: BytesLike
+    ciphertext: TypesLib.CiphertextStruct,
+    decryptionKey: BytesLike
   ];
   export type OutputTuple = [
     requestID: bigint,
-    signatureRequestID: bigint,
     blockHeight: bigint,
-    ciphertext: string,
-    signature: string
+    ciphertext: TypesLib.CiphertextStructOutput,
+    decryptionKey: string
   ];
   export interface OutputObject {
     requestID: bigint;
-    signatureRequestID: bigint;
     blockHeight: bigint;
-    ciphertext: string;
-    signature: string;
+    ciphertext: TypesLib.CiphertextStructOutput;
+    decryptionKey: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -219,24 +240,21 @@ export namespace BlocklockCallbackFailedEvent {
 export namespace BlocklockCallbackSuccessEvent {
   export type InputTuple = [
     requestID: BigNumberish,
-    signatureRequestID: BigNumberish,
     blockHeight: BigNumberish,
-    ciphertext: BytesLike,
-    signature: BytesLike
+    ciphertext: TypesLib.CiphertextStruct,
+    decryptionKey: BytesLike
   ];
   export type OutputTuple = [
     requestID: bigint,
-    signatureRequestID: bigint,
     blockHeight: bigint,
-    ciphertext: string,
-    signature: string
+    ciphertext: TypesLib.CiphertextStructOutput,
+    decryptionKey: string
   ];
   export interface OutputObject {
     requestID: bigint;
-    signatureRequestID: bigint;
     blockHeight: bigint;
-    ciphertext: string;
-    signature: string;
+    ciphertext: TypesLib.CiphertextStructOutput;
+    decryptionKey: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -247,25 +265,22 @@ export namespace BlocklockCallbackSuccessEvent {
 export namespace BlocklockRequestedEvent {
   export type InputTuple = [
     requestID: BigNumberish,
-    signatureRequestID: BigNumberish,
     blockHeight: BigNumberish,
-    ciphertext: BytesLike,
+    ciphertext: TypesLib.CiphertextStruct,
     requester: AddressLike,
     requestedAt: BigNumberish
   ];
   export type OutputTuple = [
     requestID: bigint,
-    signatureRequestID: bigint,
     blockHeight: bigint,
-    ciphertext: string,
+    ciphertext: TypesLib.CiphertextStructOutput,
     requester: string,
     requestedAt: bigint
   ];
   export interface OutputObject {
     requestID: bigint;
-    signatureRequestID: bigint;
     blockHeight: bigint;
-    ciphertext: string;
+    ciphertext: TypesLib.CiphertextStructOutput;
     requester: string;
     requestedAt: bigint;
   }
@@ -340,331 +355,342 @@ export interface BlocklockSender extends BaseContract {
   interface: BlocklockSenderInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined
+      event: TCEvent,
+      fromBlockOrBlockhash?: string | number | undefined,
+      toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
   queryFilter<TCEvent extends TypedContractEvent>(
-    filter: TypedDeferredTopicFilter<TCEvent>,
-    fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined
+      filter: TypedDeferredTopicFilter<TCEvent>,
+      fromBlockOrBlockhash?: string | number | undefined,
+      toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
 
   on<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    listener: TypedListener<TCEvent>
+      event: TCEvent,
+      listener: TypedListener<TCEvent>
   ): Promise<this>;
   on<TCEvent extends TypedContractEvent>(
-    filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>
+      filter: TypedDeferredTopicFilter<TCEvent>,
+      listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   once<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    listener: TypedListener<TCEvent>
+      event: TCEvent,
+      listener: TypedListener<TCEvent>
   ): Promise<this>;
   once<TCEvent extends TypedContractEvent>(
-    filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>
+      filter: TypedDeferredTopicFilter<TCEvent>,
+      listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent
+      event: TCEvent
   ): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
   removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent
+      event?: TCEvent
   ): Promise<this>;
 
   DEFAULT_ADMIN_ROLE: TypedContractMethod<[], [string], "view">;
 
+  DST_H1_G1: TypedContractMethod<[], [string], "view">;
+
+  DST_H2: TypedContractMethod<[], [string], "view">;
+
+  DST_H3: TypedContractMethod<[], [string], "view">;
+
+  DST_H4: TypedContractMethod<[], [string], "view">;
+
   SCHEME_ID: TypedContractMethod<[], [string], "view">;
 
   blocklockRequests: TypedContractMethod<
-    [arg0: BigNumberish],
-    [
-      [bigint, bigint, string, string, string] & {
-        signatureRequestID: bigint;
-        blockHeight: bigint;
-        ciphertext: string;
-        signature: string;
-        callback: string;
-      }
-    ],
-    "view"
+      [arg0: BigNumberish],
+      [
+            [bigint, bigint, TypesLib.CiphertextStructOutput, string, string] & {
+          decryptionRequestID: bigint;
+          blockHeight: bigint;
+          ciphertext: TypesLib.CiphertextStructOutput;
+          signature: string;
+          callback: string;
+        }
+      ],
+      "view"
   >;
 
+  decrypt: TypedContractMethod<
+      [ciphertext: TypesLib.CiphertextStruct, decryptionKey: BytesLike],
+      [string],
+      "view"
+  >;
+
+  decryptionSender: TypedContractMethod<[], [string], "view">;
+
   getRequest: TypedContractMethod<
-    [requestID: BigNumberish],
-    [TypesLib.BlocklockRequestStructOutput],
-    "view"
+      [requestID: BigNumberish],
+      [TypesLib.BlocklockRequestStructOutput],
+      "view"
   >;
 
   getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
 
   grantRole: TypedContractMethod<
-    [role: BytesLike, account: AddressLike],
-    [void],
-    "nonpayable"
+      [role: BytesLike, account: AddressLike],
+      [void],
+      "nonpayable"
   >;
 
   hasRole: TypedContractMethod<
-    [role: BytesLike, account: AddressLike],
-    [boolean],
-    "view"
+      [role: BytesLike, account: AddressLike],
+      [boolean],
+      "view"
   >;
 
   isInFlight: TypedContractMethod<[requestID: BigNumberish], [boolean], "view">;
 
-  lastRequestID: TypedContractMethod<[], [bigint], "view">;
-
-  receiveSignature: TypedContractMethod<
-    [requestID: BigNumberish, signature: BytesLike],
-    [void],
-    "nonpayable"
+  receiveDecryptionData: TypedContractMethod<
+      [requestID: BigNumberish, decryptionKey: BytesLike, signature: BytesLike],
+      [void],
+      "nonpayable"
   >;
 
   renounceRole: TypedContractMethod<
-    [role: BytesLike, callerConfirmation: AddressLike],
-    [void],
-    "nonpayable"
+      [role: BytesLike, callerConfirmation: AddressLike],
+      [void],
+      "nonpayable"
   >;
 
   requestBlocklock: TypedContractMethod<
-    [blockHeight: BigNumberish, ciphertext: BytesLike],
-    [bigint],
-    "nonpayable"
+      [blockHeight: BigNumberish, ciphertext: TypesLib.CiphertextStruct],
+      [bigint],
+      "nonpayable"
   >;
 
   revokeRole: TypedContractMethod<
-    [role: BytesLike, account: AddressLike],
-    [void],
-    "nonpayable"
-  >;
-
-  signatureRequests: TypedContractMethod<
-    [arg0: BigNumberish],
-    [bigint],
-    "view"
-  >;
-
-  signaturesToBlocklock: TypedContractMethod<
-    [arg0: BigNumberish, arg1: BigNumberish],
-    [bigint],
-    "view"
+      [role: BytesLike, account: AddressLike],
+      [void],
+      "nonpayable"
   >;
 
   supportsInterface: TypedContractMethod<
-    [interfaceId: BytesLike],
-    [boolean],
-    "view"
+      [interfaceId: BytesLike],
+      [boolean],
+      "view"
   >;
 
   getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment
+      key: string | FunctionFragment
   ): T;
 
   getFunction(
-    nameOrSignature: "DEFAULT_ADMIN_ROLE"
+      nameOrSignature: "DEFAULT_ADMIN_ROLE"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: "SCHEME_ID"
+      nameOrSignature: "DST_H1_G1"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: "blocklockRequests"
+      nameOrSignature: "DST_H2"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+      nameOrSignature: "DST_H3"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+      nameOrSignature: "DST_H4"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+      nameOrSignature: "SCHEME_ID"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+      nameOrSignature: "blocklockRequests"
   ): TypedContractMethod<
-    [arg0: BigNumberish],
-    [
-      [bigint, bigint, string, string, string] & {
-        signatureRequestID: bigint;
-        blockHeight: bigint;
-        ciphertext: string;
-        signature: string;
-        callback: string;
-      }
-    ],
-    "view"
+      [arg0: BigNumberish],
+      [
+            [bigint, bigint, TypesLib.CiphertextStructOutput, string, string] & {
+          decryptionRequestID: bigint;
+          blockHeight: bigint;
+          ciphertext: TypesLib.CiphertextStructOutput;
+          signature: string;
+          callback: string;
+        }
+      ],
+      "view"
   >;
   getFunction(
-    nameOrSignature: "getRequest"
+      nameOrSignature: "decrypt"
   ): TypedContractMethod<
-    [requestID: BigNumberish],
-    [TypesLib.BlocklockRequestStructOutput],
-    "view"
+      [ciphertext: TypesLib.CiphertextStruct, decryptionKey: BytesLike],
+      [string],
+      "view"
   >;
   getFunction(
-    nameOrSignature: "getRoleAdmin"
+      nameOrSignature: "decryptionSender"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+      nameOrSignature: "getRequest"
+  ): TypedContractMethod<
+      [requestID: BigNumberish],
+      [TypesLib.BlocklockRequestStructOutput],
+      "view"
+  >;
+  getFunction(
+      nameOrSignature: "getRoleAdmin"
   ): TypedContractMethod<[role: BytesLike], [string], "view">;
   getFunction(
-    nameOrSignature: "grantRole"
+      nameOrSignature: "grantRole"
   ): TypedContractMethod<
-    [role: BytesLike, account: AddressLike],
-    [void],
-    "nonpayable"
+      [role: BytesLike, account: AddressLike],
+      [void],
+      "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "hasRole"
+      nameOrSignature: "hasRole"
   ): TypedContractMethod<
-    [role: BytesLike, account: AddressLike],
-    [boolean],
-    "view"
+      [role: BytesLike, account: AddressLike],
+      [boolean],
+      "view"
   >;
   getFunction(
-    nameOrSignature: "isInFlight"
+      nameOrSignature: "isInFlight"
   ): TypedContractMethod<[requestID: BigNumberish], [boolean], "view">;
   getFunction(
-    nameOrSignature: "lastRequestID"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "receiveSignature"
+      nameOrSignature: "receiveDecryptionData"
   ): TypedContractMethod<
-    [requestID: BigNumberish, signature: BytesLike],
-    [void],
-    "nonpayable"
+      [requestID: BigNumberish, decryptionKey: BytesLike, signature: BytesLike],
+      [void],
+      "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "renounceRole"
+      nameOrSignature: "renounceRole"
   ): TypedContractMethod<
-    [role: BytesLike, callerConfirmation: AddressLike],
-    [void],
-    "nonpayable"
+      [role: BytesLike, callerConfirmation: AddressLike],
+      [void],
+      "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "requestBlocklock"
+      nameOrSignature: "requestBlocklock"
   ): TypedContractMethod<
-    [blockHeight: BigNumberish, ciphertext: BytesLike],
-    [bigint],
-    "nonpayable"
+      [blockHeight: BigNumberish, ciphertext: TypesLib.CiphertextStruct],
+      [bigint],
+      "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "revokeRole"
+      nameOrSignature: "revokeRole"
   ): TypedContractMethod<
-    [role: BytesLike, account: AddressLike],
-    [void],
-    "nonpayable"
+      [role: BytesLike, account: AddressLike],
+      [void],
+      "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "signatureRequests"
-  ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "signaturesToBlocklock"
-  ): TypedContractMethod<
-    [arg0: BigNumberish, arg1: BigNumberish],
-    [bigint],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "supportsInterface"
+      nameOrSignature: "supportsInterface"
   ): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
 
   getEvent(
-    key: "BlocklockCallbackFailed"
+      key: "BlocklockCallbackFailed"
   ): TypedContractEvent<
-    BlocklockCallbackFailedEvent.InputTuple,
-    BlocklockCallbackFailedEvent.OutputTuple,
-    BlocklockCallbackFailedEvent.OutputObject
+      BlocklockCallbackFailedEvent.InputTuple,
+      BlocklockCallbackFailedEvent.OutputTuple,
+      BlocklockCallbackFailedEvent.OutputObject
   >;
   getEvent(
-    key: "BlocklockCallbackSuccess"
+      key: "BlocklockCallbackSuccess"
   ): TypedContractEvent<
-    BlocklockCallbackSuccessEvent.InputTuple,
-    BlocklockCallbackSuccessEvent.OutputTuple,
-    BlocklockCallbackSuccessEvent.OutputObject
+      BlocklockCallbackSuccessEvent.InputTuple,
+      BlocklockCallbackSuccessEvent.OutputTuple,
+      BlocklockCallbackSuccessEvent.OutputObject
   >;
   getEvent(
-    key: "BlocklockRequested"
+      key: "BlocklockRequested"
   ): TypedContractEvent<
-    BlocklockRequestedEvent.InputTuple,
-    BlocklockRequestedEvent.OutputTuple,
-    BlocklockRequestedEvent.OutputObject
+      BlocklockRequestedEvent.InputTuple,
+      BlocklockRequestedEvent.OutputTuple,
+      BlocklockRequestedEvent.OutputObject
   >;
   getEvent(
-    key: "RoleAdminChanged"
+      key: "RoleAdminChanged"
   ): TypedContractEvent<
-    RoleAdminChangedEvent.InputTuple,
-    RoleAdminChangedEvent.OutputTuple,
-    RoleAdminChangedEvent.OutputObject
+      RoleAdminChangedEvent.InputTuple,
+      RoleAdminChangedEvent.OutputTuple,
+      RoleAdminChangedEvent.OutputObject
   >;
   getEvent(
-    key: "RoleGranted"
+      key: "RoleGranted"
   ): TypedContractEvent<
-    RoleGrantedEvent.InputTuple,
-    RoleGrantedEvent.OutputTuple,
-    RoleGrantedEvent.OutputObject
+      RoleGrantedEvent.InputTuple,
+      RoleGrantedEvent.OutputTuple,
+      RoleGrantedEvent.OutputObject
   >;
   getEvent(
-    key: "RoleRevoked"
+      key: "RoleRevoked"
   ): TypedContractEvent<
-    RoleRevokedEvent.InputTuple,
-    RoleRevokedEvent.OutputTuple,
-    RoleRevokedEvent.OutputObject
+      RoleRevokedEvent.InputTuple,
+      RoleRevokedEvent.OutputTuple,
+      RoleRevokedEvent.OutputObject
   >;
 
   filters: {
-    "BlocklockCallbackFailed(uint256,uint256,uint256,bytes,bytes)": TypedContractEvent<
-      BlocklockCallbackFailedEvent.InputTuple,
-      BlocklockCallbackFailedEvent.OutputTuple,
-      BlocklockCallbackFailedEvent.OutputObject
+    "BlocklockCallbackFailed(uint256,uint256,tuple,bytes)": TypedContractEvent<
+        BlocklockCallbackFailedEvent.InputTuple,
+        BlocklockCallbackFailedEvent.OutputTuple,
+        BlocklockCallbackFailedEvent.OutputObject
     >;
     BlocklockCallbackFailed: TypedContractEvent<
-      BlocklockCallbackFailedEvent.InputTuple,
-      BlocklockCallbackFailedEvent.OutputTuple,
-      BlocklockCallbackFailedEvent.OutputObject
+        BlocklockCallbackFailedEvent.InputTuple,
+        BlocklockCallbackFailedEvent.OutputTuple,
+        BlocklockCallbackFailedEvent.OutputObject
     >;
 
-    "BlocklockCallbackSuccess(uint256,uint256,uint256,bytes,bytes)": TypedContractEvent<
-      BlocklockCallbackSuccessEvent.InputTuple,
-      BlocklockCallbackSuccessEvent.OutputTuple,
-      BlocklockCallbackSuccessEvent.OutputObject
+    "BlocklockCallbackSuccess(uint256,uint256,tuple,bytes)": TypedContractEvent<
+        BlocklockCallbackSuccessEvent.InputTuple,
+        BlocklockCallbackSuccessEvent.OutputTuple,
+        BlocklockCallbackSuccessEvent.OutputObject
     >;
     BlocklockCallbackSuccess: TypedContractEvent<
-      BlocklockCallbackSuccessEvent.InputTuple,
-      BlocklockCallbackSuccessEvent.OutputTuple,
-      BlocklockCallbackSuccessEvent.OutputObject
+        BlocklockCallbackSuccessEvent.InputTuple,
+        BlocklockCallbackSuccessEvent.OutputTuple,
+        BlocklockCallbackSuccessEvent.OutputObject
     >;
 
-    "BlocklockRequested(uint256,uint256,uint256,bytes,address,uint256)": TypedContractEvent<
-      BlocklockRequestedEvent.InputTuple,
-      BlocklockRequestedEvent.OutputTuple,
-      BlocklockRequestedEvent.OutputObject
+    "BlocklockRequested(uint256,uint256,tuple,address,uint256)": TypedContractEvent<
+        BlocklockRequestedEvent.InputTuple,
+        BlocklockRequestedEvent.OutputTuple,
+        BlocklockRequestedEvent.OutputObject
     >;
     BlocklockRequested: TypedContractEvent<
-      BlocklockRequestedEvent.InputTuple,
-      BlocklockRequestedEvent.OutputTuple,
-      BlocklockRequestedEvent.OutputObject
+        BlocklockRequestedEvent.InputTuple,
+        BlocklockRequestedEvent.OutputTuple,
+        BlocklockRequestedEvent.OutputObject
     >;
 
     "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<
-      RoleAdminChangedEvent.InputTuple,
-      RoleAdminChangedEvent.OutputTuple,
-      RoleAdminChangedEvent.OutputObject
+        RoleAdminChangedEvent.InputTuple,
+        RoleAdminChangedEvent.OutputTuple,
+        RoleAdminChangedEvent.OutputObject
     >;
     RoleAdminChanged: TypedContractEvent<
-      RoleAdminChangedEvent.InputTuple,
-      RoleAdminChangedEvent.OutputTuple,
-      RoleAdminChangedEvent.OutputObject
+        RoleAdminChangedEvent.InputTuple,
+        RoleAdminChangedEvent.OutputTuple,
+        RoleAdminChangedEvent.OutputObject
     >;
 
     "RoleGranted(bytes32,address,address)": TypedContractEvent<
-      RoleGrantedEvent.InputTuple,
-      RoleGrantedEvent.OutputTuple,
-      RoleGrantedEvent.OutputObject
+        RoleGrantedEvent.InputTuple,
+        RoleGrantedEvent.OutputTuple,
+        RoleGrantedEvent.OutputObject
     >;
     RoleGranted: TypedContractEvent<
-      RoleGrantedEvent.InputTuple,
-      RoleGrantedEvent.OutputTuple,
-      RoleGrantedEvent.OutputObject
+        RoleGrantedEvent.InputTuple,
+        RoleGrantedEvent.OutputTuple,
+        RoleGrantedEvent.OutputObject
     >;
 
     "RoleRevoked(bytes32,address,address)": TypedContractEvent<
-      RoleRevokedEvent.InputTuple,
-      RoleRevokedEvent.OutputTuple,
-      RoleRevokedEvent.OutputObject
+        RoleRevokedEvent.InputTuple,
+        RoleRevokedEvent.OutputTuple,
+        RoleRevokedEvent.OutputObject
     >;
     RoleRevoked: TypedContractEvent<
-      RoleRevokedEvent.InputTuple,
-      RoleRevokedEvent.OutputTuple,
-      RoleRevokedEvent.OutputObject
+        RoleRevokedEvent.InputTuple,
+        RoleRevokedEvent.OutputTuple,
+        RoleRevokedEvent.OutputObject
     >;
   };
 }
