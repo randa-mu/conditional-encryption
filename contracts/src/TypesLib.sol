@@ -4,16 +4,6 @@ pragma solidity 0.8.24;
 import "./BLS.sol";
 
 library TypesLib {
-     // Decryption request stores details for each decryption request
-    struct DecryptionRequest {
-        bytes Ciphertext;
-        bytes conditions;
-        bytes decryptedText;
-        bytes messageToSign;
-        bytes signature;
-        address callback;
-    }
-
     // Blocklock request stores details needed to generate blocklock decryption keys
     struct BlocklockRequest {
         uint256 decryptionRequestID;

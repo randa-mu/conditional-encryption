@@ -13,21 +13,22 @@ interface IDecryptionProvider {
     /// @param ciphertext The encrypted data to be registered
     /// @param conditions The conditions that need to be met to decrypt the ciphertext
     /// @return requestID The unique ID assigned to the registered decryption request
-    function registerCiphertext(bytes calldata ciphertext, bytes calldata conditions)
+    function registerCiphertext(string calldata schemeID, bytes calldata ciphertext, bytes calldata conditions)
     external
     returns (uint256 requestID);
 
     /**
-     * @notice Decrypts the given Ciphertext for the specified request ID.
-     * @dev This function is intended to be called after a decryption operation has been completed off-chain.
-     *      The function accepts the request ID associated with the original encryption request and the
-     *      decrypted text in bytes format.
+     * @notice Provide the decryption key for a specific requestID alongside a signature.
+     * @dev This function is intended to be called after a decryption key has been generated off-chain.
+     *
      * @param requestID The unique identifier for the encryption request. This should match the ID used
      *                  when the encryption was initially requested.
-     * @param decryptedText The decrypted content in bytes format. The data should represent the original
+     * @param decryptionKey The decrypted content in bytes format. The data should represent the original
      *                      message in its decrypted form.
+     * @param signature The signature associated with the request, provided as a byte array
      */
-    function sendDecryptedCiphertext(uint256 requestID, bytes calldata decryptedText) external;
+    function fulfilDecryptionRequest(uint256 requestID, bytes calldata decryptionKey, bytes calldata signature)
+    external;
 
     // Getters
 
@@ -37,20 +38,26 @@ interface IDecryptionProvider {
      * @param requestId The ID of the request to retrieve.
      * @return The Request struct corresponding to the given requestId.
      */
-    function getRequest(uint256 requestId) external view returns (TypesLib.DecryptionRequest memory);
+    function getRequestInFlight(uint256 requestId) external view returns (TypesLib.DecryptionRequest memory);
 
     /**
-     * @notice Retrieves all requests.
-     * @dev This function returns an array of all Request structs stored in the contract.
-     * @return An array containing all the Request structs.
+     * @notice Verifies whether a specific request is in flight or not.
+     * @param requestID The ID of the request to check.
+     * @return boolean indicating whether the request is in flight or not.
      */
-    function getAllRequests() external view returns (TypesLib.DecryptionRequest[] memory);
+    function isInFlight(uint256 requestID) external view returns (bool);
+
     /**
-     * @notice Generates a message from the given request.
-     * @dev Creates a hash-based message using the `conditions` of the `Request` struct.
-     * The resulting message is the hash of the encoded values, packed into a byte array.
-     * @param r The `Request` struct containing the data for generating the message.
-     * @return A byte array representing the hashed and encoded message.
+     * @notice Retrieves the public key associated with the decryption process.
+     * @dev Returns the public key as two elliptic curve points.
+     * @return Two pairs of coordinates representing the public key points on the elliptic curve.
      */
-    function messageFrom(TypesLib.DecryptionRequest memory r) external pure returns (bytes memory);
+    function getPublicKey() external view returns (uint256[2] memory, uint256[2] memory);
+
+    /**
+     * @notice Retrieves the public key associated with the decryption process.
+     * @dev Returns the public key as bytes.
+     * @return Bytes string representing the public key points on the elliptic curve.
+     */
+    function getPublicKeyBytes() external view returns (bytes memory);
 }
