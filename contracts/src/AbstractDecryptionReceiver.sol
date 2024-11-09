@@ -4,7 +4,7 @@ pragma solidity 0.8.24;
 import {IDecryptionReceiver} from "./IDecryptionReceiver.sol";
 
 abstract contract AbstractDecryptionReceiver is IDecryptionReceiver {
-    address public immutable DECRYPTION_PROVIDER = 0x11045878Ed62Ec3aCC91cE36A46F4EF61d4616e1;
+    address public immutable DECRYPTION_PROVIDER = 0xfD1Bf3fCBf2e250AbfF4a61670DFa3ce740453e5;
 
     error NotAuthorizedDecryptionProvider();
 

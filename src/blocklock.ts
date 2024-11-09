@@ -18,7 +18,7 @@ export const BLOCKLOCK_IBE_OPTS: IbeOpts = {
     }
 }
 
-const defaultContractAddress = "0x11045878ed62ec3acc91ce36a46f4ef61d4616e1"
+const defaultContractAddress = "0xfd1bf3fcbf2e250abff4a61670dfa3ce740453e5"
 const iface = BlocklockSender__factory.createInterface()
 
 export class Blocklock {
