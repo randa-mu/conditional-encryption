@@ -19,4 +19,15 @@ interface IBlocklockProvider {
      * @return The Request struct corresponding to the given requestId.
      */
     function getRequest(uint256 requestId) external view returns (TypesLib.BlocklockRequest memory);
+
+    /**
+     * @notice performs decryption with the blocklock scheme attached to this contract
+     * @param ciphertext encrypted with blocklock
+     * @param decryptionKey for the corresponding chain height
+     * @return The Request struct corresponding to the given requestId.
+     */
+    function decrypt(TypesLib.Ciphertext calldata ciphertext, bytes calldata decryptionKey)
+    external
+    view
+    returns (bytes memory);
 }
