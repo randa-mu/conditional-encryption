@@ -139,7 +139,7 @@ export class Blocklock {
      * @param pk public key of the scheme
      * @returns encrypted message
      */
-    encrypt(message: Uint8Array, blockHeight: bigint, pk: G2): Ciphertext {
+    encrypt(message: Uint8Array, blockHeight: bigint, pk: G2 = BLOCKLOCK_DEFAULT_PUBLIC_KEY): Ciphertext {
         const identity = blockHeightToBEBytes(blockHeight)
         return encrypt_towards_identity_g1(message, identity, pk, BLOCKLOCK_IBE_OPTS)
     }
