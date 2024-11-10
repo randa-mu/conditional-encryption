@@ -10,8 +10,9 @@ interface IBlocklockProvider {
      * The blocklock decryption key will be generated once the chain reaches the specified `blockHeight`.
      * @return requestID The unique identifier assigned to this blocklock request.
      */
-    function requestBlocklock(uint256 blockHeight, bytes calldata ciphertext) external returns (uint256 requestID);
-
+    function requestBlocklock(uint256 blockHeight, TypesLib.Ciphertext calldata ciphertext)
+    external
+    returns (uint256 requestID);
     /**
      * @notice Retrieves a specific request by its ID.
      * @dev This function returns the Request struct associated with the given requestId.

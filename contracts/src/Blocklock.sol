@@ -16,19 +16,6 @@ library Blocklock {
     function decryptionSenderAddress() public pure returns (address) {
         return 0xaDE54E76eD6118F3d5b6905f63F6c49d1BFfb904;
     }
-    /**
-     * @notice Encrypts a piece of data to be decrypted at a future block height and uploads it to
-     * the contract for automatic release of the decryption key
-     * @dev Initiates a blocklock decryption key request.
-     * The blocklock decryption key will be generated once the chain reaches the specified `blockHeight`.
-     * @return requestID The unique identifier assigned to this blocklock request.
-     */
-    function encryptAndRegister(uint256 decryptionHeight, bytes calldata message) public returns (uint256) {
-        IBlocklockProvider blocklock = IBlocklockProvider(contractAddress());
-        ISignatureScheme scheme = ISignatureScheme(signatureSchemeAddress());
-        bytes memory h_m = scheme.hashToBytes(message);
-        return blocklock.requestBlocklock(decryptionHeight, h_m);
-    }
 
     /**
      * @notice Requests the generation of a blocklock decryption key at a specific blockHeight.
@@ -37,8 +24,11 @@ library Blocklock {
      * @return requestID The unique identifier assigned to this blocklock request.
      */
     function requestBlocklock(uint256 blockHeight, bytes calldata ciphertext) public returns (uint256 requestID) {
+        ISignatureScheme scheme = ISignatureScheme(signatureSchemeAddress());
+
+        TypesLib.Ciphertext memory c = abi.decode(ciphertext, (TypesLib.Ciphertext));
         IBlocklockProvider blocklock = IBlocklockProvider(contractAddress());
-        return blocklock.requestBlocklock(blockHeight, ciphertext);
+        return blocklock.requestBlocklock(blockHeight, c);
     }
 
     /**
@@ -59,7 +49,9 @@ library Blocklock {
      * @return The Request struct corresponding to the given requestId.
      */
     function decrypt(bytes calldata ciphertext, bytes calldata decryptionKey) public returns (bytes memory){
-        revert("this isn't implemented right now :( you can call directly on the contract");
+        IBlocklockProvider blocklock = IBlocklockProvider(contractAddress());
+        TypesLib.Ciphertext memory c = abi.decode(ciphertext, (TypesLib.Ciphertext));
+        return blocklock.decrypt(c, decryptionKey);
     }
 
     function verify(bytes calldata decryptionKey) public returns (bool)  {
