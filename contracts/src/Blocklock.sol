@@ -24,8 +24,6 @@ library Blocklock {
      * @return requestID The unique identifier assigned to this blocklock request.
      */
     function requestBlocklock(uint256 blockHeight, bytes calldata ciphertext) public returns (uint256 requestID) {
-        ISignatureScheme scheme = ISignatureScheme(signatureSchemeAddress());
-
         TypesLib.Ciphertext memory c = abi.decode(ciphertext, (TypesLib.Ciphertext));
         IBlocklockProvider blocklock = IBlocklockProvider(contractAddress());
         return blocklock.requestBlocklock(blockHeight, c);
@@ -48,13 +46,13 @@ library Blocklock {
      * @param decryptionKey for the corresponding chain height
      * @return The Request struct corresponding to the given requestId.
      */
-    function decrypt(bytes calldata ciphertext, bytes calldata decryptionKey) public returns (bytes memory){
+    function decrypt(bytes calldata ciphertext, bytes calldata decryptionKey) public view returns (bytes memory){
         IBlocklockProvider blocklock = IBlocklockProvider(contractAddress());
         TypesLib.Ciphertext memory c = abi.decode(ciphertext, (TypesLib.Ciphertext));
         return blocklock.decrypt(c, decryptionKey);
     }
 
-    function verify(bytes calldata decryptionKey) public returns (bool)  {
+    function verify(bytes calldata decryptionKey) public view returns (bool)  {
         ISignatureScheme scheme = ISignatureScheme(signatureSchemeAddress());
         IDecryptionProvider decrypter = IDecryptionProvider(decryptionSenderAddress());
         bytes memory m = abi.encode(block.number);
